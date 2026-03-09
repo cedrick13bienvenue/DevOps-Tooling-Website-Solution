@@ -566,3 +566,119 @@ Save and exit.
 
 > **Expected Output**: `df -h` shows `/var/www` mounted from the NFS server's private IP; `/etc/fstab` updated.
 > ![Terminal — mount command, df -h showing /var/www NFS mount, and /etc/fstab entry](screenshoots/18.png)
+
+---
+
+### 3.5 Install Apache and PHP 7.4 via Remi's Repository
+
+RHEL 8's default repos only carry PHP 7.2. PHP 7.4 is needed from Remi's repo:
+
+```bash
+# Install Apache
+sudo yum install httpd -y
+
+# Install EPEL repository
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y
+
+# Install Remi's repository
+sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
+
+# Reset PHP module and enable PHP 7.4 from Remi
+sudo dnf module reset php -y
+sudo dnf module enable php:remi-7.4 -y
+
+# Install PHP and required extensions for the tooling app
+sudo dnf install php php-opcache php-gd php-curl php-mysqlnd -y
+
+# Start and enable PHP-FPM (FastCGI Process Manager)
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+
+# Allow Apache to execute memory-mapped files (required for PHP-FPM)
+setsebool -P httpd_execmem 1
+```
+
+Start and enable Apache:
+
+```bash
+sudo systemctl start httpd
+sudo systemctl enable httpd
+sudo systemctl status httpd
+```
+
+> **Expected Output**: `httpd.service` and `php-fpm.service` both show as `active (running)` and enabled.
+> ![Terminal — Apache and PHP install complete; httpd.service and php-fpm.service active](screenshoots/19.png)
+
+**Repeat steps 3.2 – 3.5 for Web Server 2 and Web Server 3** using their respective public IPs.
+
+---
+
+### 3.6 Verify NFS Shared Storage is Working
+
+After configuring all three Web Servers, confirm they all share files through NFS.
+
+On **Web Server 1**, check that Apache's default directory is visible:
+
+```bash
+ls /var/www
+```
+
+On the **NFS Server**, the same files should appear in `/mnt/apps`:
+
+```bash
+ls /mnt/apps
+```
+
+Test cross-server file sharing — create a file from Web Server 1, then check it from Web Server 2:
+
+**On WS-1:**
+```bash
+touch /var/www/test.txt
+ls /var/www/
+```
+
+**On WS-2 (new SSH session):**
+```bash
+ls /var/www/
+# test.txt should be visible here too
+```
+
+**On NFS Server:**
+```bash
+ls /mnt/apps/
+# test.txt should also be visible here
+```
+
+> **Expected Output**: `test.txt` created on WS-1 is immediately visible on WS-2 and on the NFS server's `/mnt/apps` — confirming NFS shared storage is working correctly.
+> ![Terminal — test.txt created on WS-1; same file visible on WS-2 and NFS server /mnt/apps](screenshoots/20.png)
+
+---
+
+### 3.7 Mount Apache Log Directory to NFS
+
+Mount Apache's log directory to the NFS logs export so all Web Server logs are centralized:
+
+```bash
+sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP>:/mnt/logs /var/log/httpd
+```
+
+Persist it in `/etc/fstab`:
+
+```bash
+sudo vi /etc/fstab
+```
+
+Add:
+
+```
+<NFS-Server-Private-IP>:/mnt/logs /var/log/httpd nfs defaults 0 0
+```
+
+Verify both NFS mounts are active:
+
+```bash
+df -h
+```
+
+> **Expected Output**: `df -h` now shows both `/var/www` and `/var/log/httpd` mounted from the NFS server.
+> ![Terminal — /var/log/httpd NFS mount; df -h showing both NFS mounts active](screenshoots/21.png)
