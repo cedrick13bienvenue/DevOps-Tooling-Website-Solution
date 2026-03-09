@@ -821,3 +821,72 @@ EXIT;
 
 > **Expected Output**: `INSERT` returns `Query OK, 1 row affected`; `SELECT` shows the `myuser` admin record.
 > ![Terminal — MySQL on DB server: INSERT admin user and SELECT confirmation](screenshoots/25.png)
+
+---
+
+## Phase 4: Final Verification
+
+### 4.1 Access the Tooling Website
+
+Open the website in your browser using any Web Server's public IP or DNS name:
+
+```
+http://<Web-Server-Public-IP>/index.php
+```
+
+You should see the **DevOps Tooling website login page**.
+
+> **Expected Output**: The tooling website login page loads — showing the StegHub tooling login form.
+> ![Browser — Tooling website login page loaded via WS-1 public IP](screenshoots/26.png)
+
+---
+
+### 4.2 Log In and Verify the Dashboard
+
+Enter the admin credentials:
+- **Username**: `myuser`
+- **Password**: `password`
+
+Click **Login**.
+
+> **Expected Output**: Successful authentication — the DevOps Tooling dashboard is displayed, showing the list of DevOps tools (Jenkins, Kubernetes, Artifactory, etc.).
+> ![Browser — DevOps Tooling dashboard after successful login with myuser](screenshoots/27.png)
+
+---
+
+### 4.3 Verify Multi-Server Redundancy
+
+To confirm all three Web Servers serve the same content, open the website using each server's public IP:
+
+```
+http://<WS-1-Public-IP>/index.php
+http://<WS-2-Public-IP>/index.php
+http://<WS-3-Public-IP>/index.php
+```
+
+All three should display the same login page and the same dashboard after login — because all three read from the same NFS share and the same MySQL database.
+
+> **Expected Output**: All three Web Servers serve identical content, confirming the stateless architecture.
+> ![Browser — Same tooling dashboard accessible from WS-2 and WS-3 public IPs](screenshoots/28.png)
+
+---
+
+## Summary
+
+The complete DevOps Tooling Website solution is now fully operational:
+
+| Component | Instance Name | Role | OS |
+|---|---|---|---|
+| NFS Server | `Project7-NFS` | Shared file storage via LVM + NFS | RHEL 8 |
+| Database Server | `Project7-DB` | MySQL — `tooling` DB, `webaccess` user | Ubuntu 24.04 |
+| Web Server 1 | `Project7-Web-1` | Apache + PHP serving tooling app | RHEL 8 |
+| Web Server 2 | `Project7-Web-2` | Apache + PHP serving tooling app | RHEL 8 |
+| Web Server 3 | `Project7-Web-3` | Apache + PHP serving tooling app | RHEL 8 |
+
+**Key architectural achievements:**
+- All three Web Servers share `/var/www` from NFS — one deploy reaches all servers
+- Apache logs from all Web Servers are centralized in NFS `/mnt/logs`
+- The `/mnt/opt` NFS share is reserved for a future Jenkins installation
+- The Web Servers are fully **stateless** — removing or adding one does not affect the application
+
+---
