@@ -682,3 +682,66 @@ df -h
 
 > **Expected Output**: `df -h` now shows both `/var/www` and `/var/log/httpd` mounted from the NFS server.
 > ![Terminal — /var/log/httpd NFS mount; df -h showing both NFS mounts active](screenshoots/21.png)
+
+---
+
+### 3.8 Fork and Deploy the Tooling Application
+
+**Step 1 — Fork the repository:**
+
+Go to the **StegHub GitHub account** and fork the **tooling** repository to your own GitHub account by clicking the **Fork** button at the top-right of the repository page.
+
+**Step 2 — Install Git and clone your fork on Web Server 1:**
+
+```bash
+sudo yum install git -y
+
+git clone https://github.com/<your-github-username>/tooling.git
+```
+
+**Step 3 — Deploy the application files to `/var/www/html`:**
+
+```bash
+sudo cp -R tooling/html/. /var/www/html/
+```
+
+Verify the files are deployed:
+
+```bash
+ls /var/www/html/
+```
+
+You should see `index.php`, `functions.php`, `login.php`, and other PHP files.
+
+> **Expected Output**: Repository cloned successfully; `ls /var/www/html` shows all tooling PHP application files.
+> ![Terminal — git clone complete; ls /var/www/html showing tooling PHP files](screenshoots/22.png)
+
+> **Note**: Because `/var/www/html` is mounted from NFS, these files are automatically available on **all three Web Servers** — no need to deploy separately to each one.
+
+---
+
+**Step 4 — Open TCP port 80** in the Web Server's Security Group if not already done.
+
+**Step 5 — Disable SELinux** (if you encounter a 403 Forbidden error):
+
+```bash
+sudo setenforce 0
+```
+
+To make this permanent so it survives reboots:
+
+```bash
+sudo vi /etc/sysconfig/selinux
+```
+
+Find the line `SELINUX=enforcing` and change it to:
+
+```
+SELINUX=disabled
+```
+
+Then restart Apache:
+
+```bash
+sudo systemctl restart httpd
+```
