@@ -745,3 +745,79 @@ Then restart Apache:
 ```bash
 sudo systemctl restart httpd
 ```
+
+---
+
+### 3.9 Configure the Database Connection
+
+The tooling application uses `functions.php` to connect to MySQL. Update it with the DB server's private IP and the credentials created in Phase 2.
+
+```bash
+sudo vi /var/www/html/functions.php
+```
+
+Locate the `db_connect()` function and update the connection string:
+
+```php
+$db = mysqli_connect('<DB-Server-Private-IP>', 'webaccess', 'password', 'tooling');
+```
+
+Replace `<DB-Server-Private-IP>` with the actual private IP of your DB server (e.g., `172.31.x.x`). Save and exit.
+
+> **Expected Output**: `functions.php` saved with the correct DB server private IP, username `webaccess`, and database `tooling`.
+> ![Terminal — functions.php open in vi with updated mysqli_connect parameters](screenshoots/23.png)
+
+---
+
+### 3.10 Apply the Tooling Database Schema
+
+The repository includes `tooling-db.sql` that creates the required database tables. Apply it from the Web Server:
+
+```bash
+# Install MySQL client to connect to the remote DB server
+sudo yum install mysql -y
+
+# Apply the schema (enter 'password' when prompted)
+mysql -h <DB-Server-Private-IP> -u webaccess -p tooling < tooling/tooling-db.sql
+```
+
+Verify the tables were created:
+
+```bash
+mysql -h <DB-Server-Private-IP> -u webaccess -p tooling
+```
+
+```sql
+SHOW TABLES;
+EXIT;
+```
+
+> **Expected Output**: `tooling-db.sql` applies without errors; `SHOW TABLES` lists the `users` table (and others).
+> ![Terminal — mysql import of tooling-db.sql; SHOW TABLES listing users table](screenshoots/24.png)
+
+---
+
+### 3.11 Create an Admin User in the Database
+
+On the **DB Server**, log in to MySQL and manually insert an admin user into the `tooling` database:
+
+```bash
+sudo mysql
+```
+
+```sql
+USE tooling;
+
+INSERT INTO users (id, username, password, email, user_type, status)
+VALUES (1, 'myuser', '5f4dcc3b5aa765d61d8327deb882cf99', 'user@mail.com', 'admin', '1');
+
+-- Verify the user was inserted
+SELECT id, username, email, user_type FROM users;
+
+EXIT;
+```
+
+> **Note**: `5f4dcc3b5aa765d61d8327deb882cf99` is the MD5 hash of the word `password`. The tooling app uses MD5 for authentication.
+
+> **Expected Output**: `INSERT` returns `Query OK, 1 row affected`; `SELECT` shows the `myuser` admin record.
+> ![Terminal — MySQL on DB server: INSERT admin user and SELECT confirmation](screenshoots/25.png)
