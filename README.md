@@ -352,3 +352,123 @@ Click **Save rules**.
 
 > **Expected Output**: `rpcinfo` shows port 2049; Security Group inbound rules show all four NFS-related rules.
 > ![Terminal — rpcinfo output; AWS console — Security Group with NFS inbound rules](screenshoots/12.png)
+
+---
+
+## Phase 2: Provision and Configure the Database Server
+
+### 2.1 Launch the Database Server EC2 Instance
+
+**1.** In the AWS EC2 console, click **Launch instances**.
+
+**2.** Name it `Project7-DB`.
+
+**3.** Under **AMI**, search for and select **Ubuntu Server 24.04 LTS** (64-bit x86).
+
+**4.** Select **Instance type**: `t2.micro`.
+
+**5.** Select your existing **Key pair**.
+
+**6.** Under **Network settings** → **Edit**:
+   - Keep the same VPC and Subnet as the NFS server (same subnet = same CIDR)
+   - **Auto-assign public IP**: Enable
+   - Create a new Security Group named `Project7-DB-SG`
+   - Add inbound rules:
+     - `SSH` → Port `22` → Source: `My IP`
+     - `MySQL/Aurora` → Port `3306` → Source: `<Subnet-CIDR>` (so Web Servers on the same subnet can connect)
+
+**7.** Keep default storage (8 GiB root). Click **Launch instance**.
+
+> **Expected Output**: DB server instance is `Running` with 2/2 status checks; Security Group shows port 3306 open to subnet CIDR.
+> ![AWS console — DB server instance running; Security Group with port 3306 open to subnet CIDR](screenshoots/13.png)
+
+---
+
+### 2.2 SSH into the Database Server
+
+```bash
+ssh -i "your-key.pem" ubuntu@<DB-Server-Public-IP>
+```
+
+> **Note**: On Ubuntu EC2 instances, the default username is `ubuntu`.
+
+Update the system:
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+### 2.3 Install MySQL Server
+
+```bash
+sudo apt install mysql-server -y
+sudo systemctl enable --now mysql
+sudo systemctl status mysql
+```
+
+> **Expected Output**: `mysql.service` is `active (running)` and enabled.
+> ![Terminal — SSH into DB server; apt install mysql-server complete; mysql.service active](screenshoots/14.png)
+
+---
+
+### 2.4 Configure MySQL to Accept Remote Connections
+
+By default, MySQL only listens on `127.0.0.1`. Change the bind address so Web Servers can connect:
+
+```bash
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+Find the line:
+
+```
+bind-address = 127.0.0.1
+```
+
+Change it to:
+
+```
+bind-address = 0.0.0.0
+```
+
+Save and exit, then restart MySQL:
+
+```bash
+sudo systemctl restart mysql
+```
+
+---
+
+### 2.5 Create the Tooling Database and User
+
+```bash
+sudo mysql
+```
+
+Inside the MySQL shell, run the following SQL commands:
+
+```sql
+-- Create the application database
+CREATE DATABASE tooling;
+
+-- Create a dedicated user restricted to the Web Servers' subnet
+CREATE USER 'webaccess'@'172.31.%' IDENTIFIED BY 'password';
+
+-- Grant full privileges on the tooling database only
+GRANT ALL PRIVILEGES ON tooling.* TO 'webaccess'@'172.31.%';
+
+-- Apply privilege changes immediately
+FLUSH PRIVILEGES;
+
+-- Verify the database was created
+SHOW DATABASES;
+
+EXIT;
+```
+
+> **Note**: `'webaccess'@'172.31.%'` allows any host in the `172.31.x.x` range (your VPC) to connect.
+
+> **Expected Output**: `SHOW DATABASES` lists `tooling`; each SQL statement returns `Query OK`.
+> ![Terminal — MySQL session: CREATE DATABASE, CREATE USER, GRANT, FLUSH, SHOW DATABASES](screenshoots/15.png)
