@@ -232,3 +232,123 @@ df -h
 
 > **Expected Output**: `mount -a` returns with no errors; `df -h` still shows all three volumes mounted.
 > ![Terminal — blkid output, /etc/fstab with UUID entries, and mount -a success](screenshoots/8.png)
+
+---
+
+### 1.5 Install and Start the NFS Server
+
+```bash
+sudo yum install nfs-utils -y
+sudo systemctl start nfs-server.service
+sudo systemctl enable nfs-server.service
+sudo systemctl status nfs-server.service
+```
+
+> **Expected Output**: `nfs-server.service` shows status `active (running)` and is enabled to start on boot.
+> ![Terminal — nfs-utils install complete; nfs-server.service active and enabled](screenshoots/9.png)
+
+---
+
+### 1.6 Set Ownership and Permissions on NFS Directories
+
+The Web Servers need read, write, and execute permissions on the NFS shares:
+
+```bash
+sudo chown -R nobody: /mnt/apps
+sudo chown -R nobody: /mnt/logs
+sudo chown -R nobody: /mnt/opt
+
+sudo chmod -R 777 /mnt/apps
+sudo chmod -R 777 /mnt/logs
+sudo chmod -R 777 /mnt/opt
+
+sudo systemctl restart nfs-server.service
+```
+
+Confirm ownership:
+
+```bash
+ls -la /mnt/
+```
+
+> **Expected Output**: All three directories under `/mnt` are owned by `nobody:nobody` with `rwxrwxrwx` permissions.
+> ![Terminal — chown and chmod output; ls -la /mnt showing nobody ownership and 777 perms](screenshoots/10.png)
+
+---
+
+### 1.7 Configure NFS Exports
+
+**Step 1 — Find your subnet CIDR:**
+
+In the AWS EC2 console, click on your NFS instance → **Networking** tab → click the **Subnet ID** link → look for the **IPv4 CIDR** column. It will look something like `172.31.32.0/20`.
+
+**Step 2 — Edit the NFS exports file:**
+
+```bash
+sudo vi /etc/exports
+```
+
+Add the following (replace `<Subnet-CIDR>` with your actual subnet CIDR, e.g. `172.31.32.0/20`):
+
+```
+/mnt/apps <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
+/mnt/logs <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
+/mnt/opt  <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
+```
+
+Save and exit (`:wq`).
+
+**What these options mean:**
+- `rw` — clients can read and write
+- `sync` — writes are committed to disk before responding
+- `no_all_squash` — preserve client user IDs
+- `no_root_squash` — allow root on the client to act as root on the NFS share
+
+**Step 3 — Apply the export configuration:**
+
+```bash
+sudo exportfs -arv
+```
+
+Expected output:
+```
+exporting 172.31.32.0/20:/mnt/opt
+exporting 172.31.32.0/20:/mnt/logs
+exporting 172.31.32.0/20:/mnt/apps
+```
+
+> **Expected Output**: `exportfs -arv` lists all three exported paths with your subnet CIDR.
+> ![Terminal — /etc/exports content and exportfs -arv output showing all 3 exports](screenshoots/11.png)
+
+---
+
+### 1.8 Open NFS Ports in the Security Group
+
+**Step 1 — Check which port NFS is running on:**
+
+```bash
+rpcinfo -p | grep nfs
+```
+
+Expected output (NFS listens on **port 2049**):
+```
+100003   3   tcp  2049  nfs
+100003   4   tcp  2049  nfs
+100227   3   tcp  2049  nfs_acl
+```
+
+**Step 2 — Add Inbound Rules in AWS:**
+
+Go to **EC2** → **Security Groups** → find `Project7-NFS-SG` → click **Edit inbound rules** → **Add rule** for each of the following, setting **Source** to your **subnet CIDR**:
+
+| Type | Protocol | Port Range | Source |
+|---|---|---|---|
+| NFS | TCP | 2049 | `<Subnet-CIDR>` |
+| Custom TCP | TCP | 111 | `<Subnet-CIDR>` |
+| Custom UDP | UDP | 111 | `<Subnet-CIDR>` |
+| Custom UDP | UDP | 2049 | `<Subnet-CIDR>` |
+
+Click **Save rules**.
+
+> **Expected Output**: `rpcinfo` shows port 2049; Security Group inbound rules show all four NFS-related rules.
+> ![Terminal — rpcinfo output; AWS console — Security Group with NFS inbound rules](screenshoots/12.png)
