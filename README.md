@@ -129,3 +129,106 @@ sudo df -h
 
 > **Expected Output**: `lsblk` shows 4 disks. The 3 extra disks have no mount points and no partitions.
 > ![Terminal — lsblk output showing xvdb, xvdc, xvdd with no partitions](screenshoots/5.png)
+
+---
+
+### 1.4 Configure LVM on the NFS Server
+
+> **Important**: Unlike the previous WordPress project where volumes were formatted as `ext4`, this project uses **`xfs`** filesystem.
+
+**Step 1 — Install LVM tools (if not present):**
+
+```bash
+sudo yum install lvm2 -y
+```
+
+**Step 2 — Create Physical Volumes on all three disks:**
+
+```bash
+sudo pvcreate /dev/xvdb /dev/xvdc /dev/xvdd
+```
+
+Expected output:
+```
+  Physical volume "/dev/xvdb" successfully created.
+  Physical volume "/dev/xvdc" successfully created.
+  Physical volume "/dev/xvdd" successfully created.
+```
+
+**Step 3 — Create a Volume Group named `webdata-vg`:**
+
+```bash
+sudo vgcreate webdata-vg /dev/xvdb /dev/xvdc /dev/xvdd
+sudo vgs
+```
+
+**Step 4 — Create 3 Logical Volumes:**
+
+```bash
+sudo lvcreate -n lv-apps -L 9G webdata-vg   # For web server files
+sudo lvcreate -n lv-logs -L 9G webdata-vg   # For web server logs
+sudo lvcreate -n lv-opt  -L 9G webdata-vg   # For Jenkins (Phase 8)
+sudo lvs
+```
+
+> **Expected Output**: `sudo lvs` shows `lv-apps`, `lv-logs`, and `lv-opt` each with ~9 GiB in `webdata-vg`.
+> ![Terminal — pvcreate, vgcreate, lvcreate, and lvs output](screenshoots/6.png)
+
+---
+
+**Step 5 — Format all three Logical Volumes as `xfs`:**
+
+```bash
+sudo mkfs -t xfs /dev/webdata-vg/lv-apps
+sudo mkfs -t xfs /dev/webdata-vg/lv-logs
+sudo mkfs -t xfs /dev/webdata-vg/lv-opt
+```
+
+**Step 6 — Create mount point directories under `/mnt`:**
+
+```bash
+sudo mkdir -p /mnt/apps /mnt/logs /mnt/opt
+```
+
+**Step 7 — Mount the Logical Volumes:**
+
+```bash
+sudo mount /dev/webdata-vg/lv-apps /mnt/apps
+sudo mount /dev/webdata-vg/lv-logs /mnt/logs
+sudo mount /dev/webdata-vg/lv-opt  /mnt/opt
+df -h
+```
+
+> **Expected Output**: `df -h` shows `/mnt/apps`, `/mnt/logs`, and `/mnt/opt` each mounted on their respective `xfs` logical volumes.
+> ![Terminal — mkfs.xfs on all 3 LVs, mount commands, and df -h showing 3 mount points](screenshoots/7.png)
+
+---
+
+**Step 8 — Make mounts persistent across reboots via `/etc/fstab`:**
+
+```bash
+sudo blkid | grep webdata
+```
+
+Open `/etc/fstab` and add the three UUID entries (replace UUID values with your actual output from `blkid`):
+
+```bash
+sudo vi /etc/fstab
+```
+
+```
+UUID=<lv-apps-uuid>  /mnt/apps  xfs  defaults  0 0
+UUID=<lv-logs-uuid>  /mnt/logs  xfs  defaults  0 0
+UUID=<lv-opt-uuid>   /mnt/opt   xfs  defaults  0 0
+```
+
+Save and exit (`:wq`), then verify:
+
+```bash
+sudo mount -a
+sudo systemctl daemon-reload
+df -h
+```
+
+> **Expected Output**: `mount -a` returns with no errors; `df -h` still shows all three volumes mounted.
+> ![Terminal — blkid output, /etc/fstab with UUID entries, and mount -a success](screenshoots/8.png)
