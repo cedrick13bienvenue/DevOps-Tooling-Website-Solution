@@ -472,3 +472,97 @@ EXIT;
 
 > **Expected Output**: `SHOW DATABASES` lists `tooling`; each SQL statement returns `Query OK`.
 > ![Terminal — MySQL session: CREATE DATABASE, CREATE USER, GRANT, FLUSH, SHOW DATABASES](screenshoots/15.png)
+
+---
+
+## Phase 3: Provision and Configure the Web Servers
+
+Each of the three Web Servers must be configured identically. Launch all three instances first, then configure them one by one.
+
+### 3.1 Launch Three Web Server EC2 Instances
+
+**1.** In the AWS EC2 console, click **Launch instances**.
+
+**2.** Under **Number of instances**, enter `3`.
+
+**3.** Name them `Project7-Web` (AWS will append `-1`, `-2`, `-3`).
+
+**4.** Under **AMI**, select **Red Hat Enterprise Linux 8** (same as the NFS server).
+
+**5.** Select **Instance type**: `t2.micro`.
+
+**6.** Select your existing **Key pair**.
+
+**7.** Under **Network settings** → **Edit**:
+   - Same VPC and Subnet as NFS and DB servers
+   - **Auto-assign public IP**: Enable
+   - Create a new Security Group named `Project7-Web-SG`
+   - Add inbound rules:
+     - `SSH` → Port `22` → Source: `My IP`
+     - `HTTP` → Port `80` → Source: `0.0.0.0/0` (public web traffic)
+
+**8.** Keep default storage (8 GiB root). Click **Launch instances**.
+
+> **Expected Output**: Three Web Server instances are `Running` with 2/2 status checks each.
+> ![AWS console — Three Web Server instances running; Security Group with SSH and HTTP open](screenshoots/16.png)
+
+---
+
+### 3.2 SSH into Web Server 1
+
+```bash
+ssh -i "your-key.pem" ec2-user@<WS-1-Public-IP>
+```
+
+---
+
+### 3.3 Install NFS Client
+
+```bash
+sudo yum install nfs-utils nfs4-acl-tools -y
+```
+
+> **Expected Output**: `nfs-utils` and `nfs4-acl-tools` installed successfully with `Complete!`.
+> ![Terminal — SSH into WS-1; yum install nfs-utils and nfs4-acl-tools complete](screenshoots/17.png)
+
+---
+
+### 3.4 Mount the NFS Share to `/var/www`
+
+This mounts the NFS server's `/mnt/apps` directory to the Web Server's `/var/www`, making both point to the same files.
+
+```bash
+# Create the target directory
+sudo mkdir -p /var/www
+
+# Mount the NFS export (replace <NFS-Server-Private-IP> with actual private IP)
+sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP>:/mnt/apps /var/www
+```
+
+Verify the mount is active:
+
+```bash
+df -h
+```
+
+You should see a line like:
+```
+172.31.x.x:/mnt/apps   9.0G  104M  8.9G   2% /var/www
+```
+
+**Make the mount persist after reboot:**
+
+```bash
+sudo vi /etc/fstab
+```
+
+Add this line at the bottom (replace with your NFS server's private IP):
+
+```
+<NFS-Server-Private-IP>:/mnt/apps /var/www nfs defaults 0 0
+```
+
+Save and exit.
+
+> **Expected Output**: `df -h` shows `/var/www` mounted from the NFS server's private IP; `/etc/fstab` updated.
+> ![Terminal — mount command, df -h showing /var/www NFS mount, and /etc/fstab entry](screenshoots/18.png)
