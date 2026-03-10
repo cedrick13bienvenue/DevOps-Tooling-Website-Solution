@@ -633,7 +633,6 @@ sudo systemctl status httpd
 ```
 
 > **Expected Output**: `httpd.service` and `php-fpm.service` both show as `active (running)` and enabled.
-> ![Terminal — Apache and PHP install complete; httpd.service and php-fpm.service active](screenshoots/19.png)
 
 **Repeat steps 3.2 – 3.5 for Web Server 2 and Web Server 3** using their respective public IPs.
 
@@ -676,7 +675,6 @@ ls /mnt/apps/
 ```
 
 > **Expected Output**: `test.txt` created on WS-1 is immediately visible on WS-2 and on the NFS server's `/mnt/apps` — confirming NFS shared storage is working correctly.
-> ![Terminal — test.txt created on WS-1; same file visible on WS-2 and NFS server /mnt/apps](screenshoots/20.png)
 
 ---
 
@@ -707,7 +705,6 @@ df -h
 ```
 
 > **Expected Output**: `df -h` now shows both `/var/www` and `/var/log/httpd` mounted from the NFS server.
-> ![Terminal — /var/log/httpd NFS mount; df -h showing both NFS mounts active](screenshoots/21.png)
 
 ---
 
@@ -740,7 +737,6 @@ ls /var/www/html/
 You should see `index.php`, `functions.php`, `login.php`, and other PHP files.
 
 > **Expected Output**: Repository cloned successfully; `ls /var/www/html` shows all tooling PHP application files.
-> ![Terminal — git clone complete; ls /var/www/html showing tooling PHP files](screenshoots/22.png)
 
 > **Note**: Because `/var/www/html` is mounted from NFS, these files are automatically available on **all three Web Servers** — no need to deploy separately to each one.
 
@@ -791,7 +787,6 @@ $db = mysqli_connect('<DB-Server-Private-IP>', 'webaccess', 'password', 'tooling
 Replace `<DB-Server-Private-IP>` with the actual private IP of your DB server (e.g., `172.31.x.x`). Save and exit.
 
 > **Expected Output**: `functions.php` saved with the correct DB server private IP, username `webaccess`, and database `tooling`.
-> ![Terminal — functions.php open in vi with updated mysqli_connect parameters](screenshoots/23.png)
 
 ---
 
@@ -819,7 +814,6 @@ EXIT;
 ```
 
 > **Expected Output**: `tooling-db.sql` applies without errors; `SHOW TABLES` lists the `users` table (and others).
-> ![Terminal — mysql import of tooling-db.sql; SHOW TABLES listing users table](screenshoots/24.png)
 
 ---
 
@@ -846,7 +840,6 @@ EXIT;
 > **Note**: `5f4dcc3b5aa765d61d8327deb882cf99` is the MD5 hash of the word `password`. The tooling app uses MD5 for authentication.
 
 > **Expected Output**: `INSERT` returns `Query OK, 1 row affected`; `SELECT` shows the `myuser` admin record.
-> ![Terminal — MySQL on DB server: INSERT admin user and SELECT confirmation](screenshoots/25.png)
 
 ---
 
@@ -863,7 +856,6 @@ http://<Web-Server-Public-IP>/index.php
 You should see the **DevOps Tooling website login page**.
 
 > **Expected Output**: The tooling website login page loads — showing the StegHub tooling login form.
-> ![Browser — Tooling website login page loaded via WS-1 public IP](screenshoots/26.png)
 
 ---
 
@@ -876,7 +868,6 @@ Enter the admin credentials:
 Click **Login**.
 
 > **Expected Output**: Successful authentication — the DevOps Tooling dashboard is displayed, showing the list of DevOps tools (Jenkins, Kubernetes, Artifactory, etc.).
-> ![Browser — DevOps Tooling dashboard after successful login with myuser](screenshoots/27.png)
 
 ---
 
@@ -893,7 +884,6 @@ http://<WS-3-Public-IP>/index.php
 All three should display the same login page and the same dashboard after login — because all three read from the same NFS share and the same MySQL database.
 
 > **Expected Output**: All three Web Servers serve identical content, confirming the stateless architecture.
-> ![Browser — Same tooling dashboard accessible from WS-2 and WS-3 public IPs](screenshoots/28.png)
 
 ---
 
