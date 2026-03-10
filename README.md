@@ -121,14 +121,28 @@ Run `lsblk` to confirm the three additional EBS volumes are attached and visible
 lsblk
 ```
 
-You should see your root disk (e.g., `xvda`) plus three additional disks (`xvdb`, `xvdc`, `xvdd`) — or `nvme` names depending on the instance type. The extra disks will have no partitions yet.
+> **Device naming note**: On modern instance types (t3, t2 in some regions), EBS volumes appear as **NVMe devices** (`nvme0n1`, `nvme1n1`, `nvme2n1`, `nvme3n1`) rather than the traditional `xvda/xvdb/xvdc/xvdd` names. Your root volume is always the disk with partitions; the extra disks will have no partitions yet.
+
+Expected output example (NVMe naming):
+```
+NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+nvme1n1     259:0    0   10G  0 disk
+nvme2n1     259:1    0   10G  0 disk
+nvme3n1     259:2    0   10G  0 disk
+nvme0n1     259:3    0   10G  0 disk
+├─nvme0n1p1 259:4    0    1M  0 part
+├─nvme0n1p2 259:5    0  200M  0 part /boot/efi
+└─nvme0n1p3 259:6    0  9.8G  0 part /
+```
+
+> **If you only see 1 or 2 extra disks**: Some or all of the three additional EBS volumes were not successfully attached at launch. Go to **AWS Console → EC2 → Volumes**, find the volumes in **"Available"** state in the **same Availability Zone** as your instance, right-click each → **Attach Volume** → select your `Project7-NFS` instance → **Attach**. Then re-run `lsblk` to confirm all three appear.
 
 ```bash
 sudo df -h
 ```
 
-> **Expected Output**: `lsblk` shows 4 disks. The 3 extra disks have no mount points and no partitions.
-> ![Terminal — lsblk output showing xvdb, xvdc, xvdd with no partitions](screenshoots/5.png)
+> **Expected Output**: `lsblk` shows 4 disks total. The 3 extra disks have no mount points and no partitions.
+> ![Terminal — lsblk output showing nvme devices with no partitions](screenshoots/5.png)
 
 ---
 
@@ -144,21 +158,33 @@ sudo yum install lvm2 -y
 
 **Step 2 — Create Physical Volumes on all three disks:**
 
+> **Use the actual device names from your `lsblk` output.** On modern instance types the disks are NVMe devices. Replace `nvme1n1`, `nvme2n1`, `nvme3n1` with whatever your three extra disks are called (everything that is NOT the root disk with partitions).
+
+```bash
+sudo pvcreate /dev/nvme1n1 /dev/nvme2n1 /dev/nvme3n1
+```
+
+If you're on an older instance type that uses traditional naming, use:
 ```bash
 sudo pvcreate /dev/xvdb /dev/xvdc /dev/xvdd
 ```
 
 Expected output:
 ```
-  Physical volume "/dev/xvdb" successfully created.
-  Physical volume "/dev/xvdc" successfully created.
-  Physical volume "/dev/xvdd" successfully created.
+  Physical volume "/dev/nvme1n1" successfully created.
+  Physical volume "/dev/nvme2n1" successfully created.
+  Physical volume "/dev/nvme3n1" successfully created.
 ```
 
 **Step 3 — Create a Volume Group named `webdata-vg`:**
 
 ```bash
-sudo vgcreate webdata-vg /dev/xvdb /dev/xvdc /dev/xvdd
+# NVMe naming:
+sudo vgcreate webdata-vg /dev/nvme1n1 /dev/nvme2n1 /dev/nvme3n1
+
+# Traditional naming:
+# sudo vgcreate webdata-vg /dev/xvdb /dev/xvdc /dev/xvdd
+
 sudo vgs
 ```
 
