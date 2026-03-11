@@ -133,13 +133,14 @@ nvme0n1     259:3    0   10G  0 disk
 ```
 
 > **If you only see 1 or 2 extra disks**: Some or all of the three additional EBS volumes were not successfully attached at launch. Go to **AWS Console → EC2 → Volumes**, find the volumes in **"Available"** state in the **same Availability Zone** as your instance, right-click each → **Attach Volume** → select your `Project7-NFS` instance → **Attach**. Then re-run `lsblk` to confirm all three appear.
+> ![AWS console — Attach Volume page: selecting Project7-NFS instance and device name /dev/sdd](screenshoots/2.png)
 
 ```bash
 sudo df -h
 ```
 
 > **Expected Output**: `lsblk` shows 4 disks total. The 3 extra disks have no mount points and no partitions.
-> ![Terminal — lsblk output showing nvme devices with no partitions](screenshoots/5.png)
+> ![Terminal — lsblk output showing nvme devices with no partitions](screenshoots/1.png)
 
 ---
 
