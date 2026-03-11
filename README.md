@@ -56,7 +56,6 @@ All three Web Servers mount the same directory from the NFS server and connect t
 **3.** Under **Application and OS Images (Amazon Machine Image)**, click **Browse more AMIs** → search for `Red Hat Enterprise Linux 8` → select the **RHEL 8** AMI (64-bit x86).
 
 > **Expected Output**: The AMI section shows "Red Hat Enterprise Linux 8" selected.
-> ![AWS console — NFS instance name and RHEL 8 AMI selected](screenshoots/1.png)
 
 ---
 
@@ -77,7 +76,6 @@ All three Web Servers mount the same directory from the NFS server and connect t
    - Volume 3: `10 GiB`, `gp3`
 
 > **Expected Output**: The storage section shows 4 volumes total — 1 root + 3 additional EBS volumes.
-> ![AWS console — NFS instance type, key pair, security group, and 4 EBS volumes configured](screenshoots/2.png)
 
 ---
 
@@ -88,7 +86,6 @@ All three Web Servers mount the same directory from the NFS server and connect t
    - **Private IPv4 address** (Web Servers will use this to mount NFS)
 
 > **Expected Output**: NFS instance is `Running` with 2/2 status checks. Public and private IPs are visible.
-> ![AWS console — NFS instance running, instance details showing public and private IP](screenshoots/3.png)
 
 ---
 
