@@ -269,7 +269,7 @@ sudo systemctl status nfs-server.service
 ```
 
 > **Expected Output**: `nfs-server.service` shows status `active (running)` and is enabled to start on boot.
-> ![Terminal — nfs-utils install complete; nfs-server.service active and enabled](screenshoots/9.png)
+> ![Terminal — nfs-utils install complete; nfs-server.service active and enabled](screenshoots/6.png)
 
 ---
 
@@ -296,7 +296,7 @@ ls -la /mnt/
 ```
 
 > **Expected Output**: All three directories under `/mnt` are owned by `nobody:nobody` with `rwxrwxrwx` permissions.
-> ![Terminal — chown and chmod output; ls -la /mnt showing nobody ownership and 777 perms](screenshoots/10.png)
+> ![Terminal — chown and chmod output; ls -la /mnt showing nobody ownership and 777 perms](screenshoots/7.png)
 
 ---
 
@@ -342,7 +342,7 @@ exporting 172.31.32.0/20:/mnt/apps
 ```
 
 > **Expected Output**: `exportfs -arv` lists all three exported paths with your subnet CIDR.
-> ![Terminal — /etc/exports content and exportfs -arv output showing all 3 exports](screenshoots/11.png)
+> ![Terminal — /etc/exports content and exportfs -arv output showing all 3 exports](screenshoots/7.png)
 
 ---
 
