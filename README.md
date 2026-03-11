@@ -432,7 +432,7 @@ sudo systemctl status mysql
 ```
 
 > **Expected Output**: `mysql.service` is `active (running)` and enabled.
-> ![Terminal — SSH into DB server; apt install mysql-server complete; mysql.service active](screenshoots/14.png)
+> ![Terminal — apt upgrade complete, mysql-server installed, mysql.service active and running on Ubuntu](screenshoots/9.png)
 
 ---
 
@@ -494,7 +494,7 @@ EXIT;
 > **Note**: `'webaccess'@'172.31.%'` allows any host in the `172.31.x.x` range (your VPC) to connect.
 
 > **Expected Output**: `SHOW DATABASES` lists `tooling`; each SQL statement returns `Query OK`.
-> ![Terminal — MySQL session: CREATE DATABASE, CREATE USER, GRANT, FLUSH, SHOW DATABASES](screenshoots/15.png)
+> ![Terminal — MySQL session: CREATE DATABASE tooling, CREATE USER webaccess, GRANT, FLUSH, SHOW DATABASES](screenshoots/10.png)
 
 ---
 
