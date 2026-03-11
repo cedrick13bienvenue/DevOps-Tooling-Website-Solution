@@ -527,7 +527,7 @@ Each of the three Web Servers must be configured identically. Launch all three i
 **8.** Keep default storage (8 GiB root). Click **Launch instances**.
 
 > **Expected Output**: Three Web Server instances are `Running` with 2/2 status checks each.
-> ![AWS console — Three Web Server instances running; Security Group with SSH and HTTP open](screenshoots/16.png)
+> ![AWS console — Three Web Server instances running with 3/3 status checks; Project7-Web-1 instance details with public and private IP](screenshoots/11.png)
 
 ---
 
@@ -546,7 +546,7 @@ sudo yum install nfs-utils nfs4-acl-tools -y
 ```
 
 > **Expected Output**: `nfs-utils` and `nfs4-acl-tools` installed successfully with `Complete!`.
-> ![Terminal — SSH into WS-1; yum install nfs-utils and nfs4-acl-tools complete](screenshoots/17.png)
+> ![Terminal — yum install nfs-utils and nfs4-acl-tools complete with NFS client symlinks created](screenshoots/12.png)
 
 ---
 
@@ -588,7 +588,6 @@ Add this line at the bottom (replace with your NFS server's private IP):
 Save and exit.
 
 > **Expected Output**: `df -h` shows `/var/www` mounted from the NFS server's private IP; `/etc/fstab` updated.
-> ![Terminal — mount command, df -h showing /var/www NFS mount, and /etc/fstab entry](screenshoots/18.png)
 
 ---
 
