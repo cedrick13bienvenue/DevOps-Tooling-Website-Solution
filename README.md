@@ -375,7 +375,7 @@ Go to **EC2** → **Security Groups** → find `Project7-NFS-SG` → click **Edi
 Click **Save rules**.
 
 > **Expected Output**: `rpcinfo` shows port 2049; Security Group inbound rules show all four NFS-related rules.
-> ![Terminal — rpcinfo output; AWS console — Security Group with NFS inbound rules](screenshoots/12.png)
+> ![AWS console — Security Group inbound rules showing NFS ports 111 (TCP/UDP) and 2049 (TCP/UDP) open to subnet CIDR](screenshoots/8.png)
 
 ---
 
@@ -404,7 +404,6 @@ Click **Save rules**.
 **7.** Keep default storage (8 GiB root). Click **Launch instance**.
 
 > **Expected Output**: DB server instance is `Running` with 2/2 status checks; Security Group shows port 3306 open to subnet CIDR.
-> ![AWS console — DB server instance running; Security Group with port 3306 open to subnet CIDR](screenshoots/13.png)
 
 ---
 
