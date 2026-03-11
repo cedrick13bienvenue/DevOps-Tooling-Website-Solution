@@ -196,7 +196,7 @@ sudo lvs
 ```
 
 > **Expected Output**: `sudo lvs` shows `lv-apps`, `lv-logs`, and `lv-opt` each with ~9 GiB in `webdata-vg`.
-> ![Terminal — pvcreate, vgcreate, lvcreate, and lvs output](screenshoots/6.png)
+> ![Terminal — pvcreate, vgcreate, lvcreate, and lvs output](screenshoots/3.png)
 
 ---
 
