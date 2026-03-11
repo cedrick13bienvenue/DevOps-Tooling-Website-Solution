@@ -629,6 +629,9 @@ sudo systemctl status httpd
 ```
 
 > **Expected Output**: `httpd.service` and `php-fpm.service` both show as `active (running)` and enabled.
+> ![Terminal — WS-1: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/13.png)
+> ![Terminal — WS-2: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/14.png)
+> ![Terminal — WS-3: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/16.png)
 
 **Repeat steps 3.2 – 3.5 for Web Server 2 and Web Server 3** using their respective public IPs.
 
@@ -671,6 +674,7 @@ ls /mnt/apps/
 ```
 
 > **Expected Output**: `test.txt` created on WS-1 is immediately visible on WS-2 and on the NFS server's `/mnt/apps` — confirming NFS shared storage is working correctly.
+> ![Terminal — touch /var/www/test.txt on WS-3 and ls /var/www/html showing shared PHP application files](screenshoots/15.png)
 
 ---
 
@@ -733,6 +737,8 @@ ls /var/www/html/
 You should see `index.php`, `functions.php`, `login.php`, and other PHP files.
 
 > **Expected Output**: Repository cloned successfully; `ls /var/www/html` shows all tooling PHP application files.
+> ![Terminal — git install complete, git clone of tooling repo, ls /var/www/html showing PHP files](screenshoots/17.png)
+> ![Terminal — git clone complete with remote delta stats, ls /var/www/html listing index.php, login.php, functions.php and more](screenshoots/18.png)
 
 > **Note**: Because `/var/www/html` is mounted from NFS, these files are automatically available on **all three Web Servers** — no need to deploy separately to each one.
 
