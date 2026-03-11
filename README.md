@@ -224,7 +224,7 @@ df -h
 ```
 
 > **Expected Output**: `df -h` shows `/mnt/apps`, `/mnt/logs`, and `/mnt/opt` each mounted on their respective `xfs` logical volumes.
-> ![Terminal — mkfs.xfs on all 3 LVs, mount commands, and df -h showing 3 mount points](screenshoots/7.png)
+> ![Terminal — mkfs.xfs on all 3 LVs, mount commands, and df -h showing 3 mount points](screenshoots/4.png)
 
 ---
 
@@ -255,7 +255,7 @@ df -h
 ```
 
 > **Expected Output**: `mount -a` returns with no errors; `df -h` still shows all three volumes mounted.
-> ![Terminal — blkid output, /etc/fstab with UUID entries, and mount -a success](screenshoots/8.png)
+> ![Terminal — blkid output, /etc/fstab with UUID entries, and mount -a success](screenshoots/5.png)
 
 ---
 
