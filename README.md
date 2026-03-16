@@ -681,31 +681,36 @@ ls /mnt/apps/
 
 ### 3.7 Mount Apache Log Directory to NFS
 
-Mount Apache's log directory to the NFS logs export so all Web Server logs are centralized:
+Centralise Apache logs from all three Web Servers by mounting `/var/log/httpd` to the NFS server's `/mnt/logs` export. **Repeat on all three Web Servers.**
 
 ```bash
 sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP>:/mnt/logs /var/log/httpd
 ```
 
-Persist it in `/etc/fstab`:
+Persist both NFS mounts in `/etc/fstab` (apps and logs):
 
 ```bash
 sudo vi /etc/fstab
 ```
 
-Add:
+Add both lines (replace with your NFS server private IP):
 
 ```
-<NFS-Server-Private-IP>:/mnt/logs /var/log/httpd nfs defaults 0 0
+<NFS-Server-Private-IP>:/mnt/apps  /var/www        nfs defaults 0 0
+<NFS-Server-Private-IP>:/mnt/logs  /var/log/httpd  nfs defaults 0 0
 ```
 
-Verify both NFS mounts are active:
+Save and exit (`:wq`), then verify:
 
 ```bash
+sudo mount -a
 df -h
 ```
 
-> **Expected Output**: `df -h` now shows both `/var/www` and `/var/log/httpd` mounted from the NFS server.
+> **Expected Output**: `df -h` shows both `172.31.x.x:/mnt/apps` on `/var/www` and `172.31.x.x:/mnt/logs` on `/var/log/httpd` — confirmed on all three Web Servers.
+> ![Terminal — WS-1: df -h showing /mnt/logs on /var/log/httpd and /mnt/apps on /var/www; /etc/fstab updated; mount -a clean](screenshoots/19.png)
+> ![Terminal — WS-2: same dual NFS mounts active and persisted in /etc/fstab](screenshoots/20.png)
+> ![Terminal — WS-3: same dual NFS mounts active and persisted in /etc/fstab](screenshoots/21.png)
 
 ---
 
