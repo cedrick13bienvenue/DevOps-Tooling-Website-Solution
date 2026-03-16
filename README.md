@@ -634,6 +634,35 @@ sudo systemctl status httpd
 > ![Terminal — WS-2: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/14.png)
 > ![Terminal — WS-3: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/16.png)
 
+---
+
+> **Troubleshooting — Apache fails with `Permission denied: could not open error log`**
+>
+> This happens when Apache was installed before the NFS mount was set up, or when SELinux blocks Apache from writing to the NFS-mounted `/var/log/httpd`. Run all three fixes on each Web Server:
+>
+> ```bash
+> # 1. Create the document root if it does not exist yet
+> sudo mkdir -p /var/www/html
+>
+> # 2. Disable SELinux enforcement and allow Apache to use NFS
+> sudo setenforce 0
+> sudo setsebool -P httpd_use_nfs on
+>
+> # 3. Fix permissions on the NFS-mounted log directory
+> sudo chmod -R 777 /var/log/httpd
+>
+> # 4. Make SELinux permanently disabled so it survives reboots
+> sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
+>
+> # 5. Restart Apache
+> sudo systemctl restart httpd
+> sudo systemctl status httpd
+> ```
+>
+> ![Terminal — WS-1: mkdir /var/www/html; setenforce 0; setsebool httpd_use_nfs on; chmod /var/log/httpd; httpd active](screenshoots/22.png)
+> ![Terminal — WS-2: setenforce 0; setsebool httpd_use_nfs on; httpd restart; httpd active running](screenshoots/23.png)
+> ![Terminal — WS-3: setenforce 0; setsebool httpd_use_nfs on; httpd restart; httpd active running](screenshoots/24.png)
+
 **Repeat steps 3.2 – 3.5 for Web Server 2 and Web Server 3** using their respective public IPs.
 
 ---
