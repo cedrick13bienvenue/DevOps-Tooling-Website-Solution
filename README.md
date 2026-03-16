@@ -747,35 +747,34 @@ df -h
 
 **Step 1 — Fork the repository:**
 
-Go to the **StegHub GitHub account** and fork the **tooling** repository to your own GitHub account by clicking the **Fork** button at the top-right of the repository page.
+In your browser, go to:
+```
+https://github.com/StegTechHub/tooling
+```
+Click the **Fork** button (top-right) → select your own GitHub account → click **Create fork**. Your fork URL will be `https://github.com/<your-github-username>/tooling`.
 
-**Step 2 — Install Git and clone your fork on Web Server 1:**
+**Step 2 — Install Git and clone your fork on Web Server 1 only:**
 
 ```bash
 sudo yum install git -y
-
 git clone https://github.com/<your-github-username>/tooling.git
 ```
+
+> **Note**: Only do this on **WS-1**. Because `/var/www/html` is NFS-shared, the files will automatically appear on WS-2 and WS-3 as well.
 
 **Step 3 — Deploy the application files to `/var/www/html`:**
 
 ```bash
 sudo cp -R tooling/html/. /var/www/html/
-```
-
-Verify the files are deployed:
-
-```bash
 ls /var/www/html/
 ```
 
-You should see `index.php`, `functions.php`, `login.php`, and other PHP files.
+You should see `index.php`, `login.php`, `functions.php`, `register.php`, `admin_tooling.php`, and other PHP files.
 
-> **Expected Output**: Repository cloned successfully; `ls /var/www/html` shows all tooling PHP application files.
+> **Expected Output**: Repository cloned; `cp -R` deploys all files; `ls /var/www/html` lists the full PHP application.
 > ![Terminal — git install complete, git clone of tooling repo, ls /var/www/html showing PHP files](screenshoots/17.png)
 > ![Terminal — git clone complete with remote delta stats, ls /var/www/html listing index.php, login.php, functions.php and more](screenshoots/18.png)
-
-> **Note**: Because `/var/www/html` is mounted from NFS, these files are automatically available on **all three Web Servers** — no need to deploy separately to each one.
+> ![Terminal — WS-1: git clone https://github.com/StegTechHub/tooling complete; cp -R html/ to /var/www/html; ls confirming all PHP app files deployed](screenshoots/25.png)
 
 ---
 
