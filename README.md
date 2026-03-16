@@ -808,21 +808,32 @@ sudo systemctl restart httpd
 
 ### 3.9 Configure the Database Connection
 
-The tooling application uses `functions.php` to connect to MySQL. Update it with the DB server's private IP and the credentials created in Phase 2.
+The tooling application uses `functions.php` to connect to MySQL. Update it with the DB server's **private IP** and the credentials created in Phase 2.
+
+> **WS-1 only** — the file is on the NFS share so the change applies to all three servers automatically.
+
+Find your DB server's private IP in the **AWS Console → EC2 → Instances → `Project7-DB` → Private IPv4 address**.
 
 ```bash
 sudo vi /var/www/html/functions.php
 ```
 
-Locate the `db_connect()` function and update the connection string:
+Locate the `mysqli_connect` line — it looks like:
+
+```php
+$db = mysqli_connect('mysql.tooling.svc.cluster.local', 'admin', 'admin', 'tooling');
+```
+
+Replace it with your actual DB private IP and credentials:
 
 ```php
 $db = mysqli_connect('<DB-Server-Private-IP>', 'webaccess', 'password', 'tooling');
 ```
 
-Replace `<DB-Server-Private-IP>` with the actual private IP of your DB server (e.g., `172.31.x.x`). Save and exit.
+Save and exit (`:wq`).
 
-> **Expected Output**: `functions.php` saved with the correct DB server private IP, username `webaccess`, and database `tooling`.
+> **Expected Output**: `functions.php` updated with the correct DB server private IP, username `webaccess`, and database `tooling`.
+> ![Terminal — functions.php showing updated mysqli_connect with DB server private IP 172.31.23.185, webaccess user, and tooling database](screenshoots/26.png)
 
 ---
 
