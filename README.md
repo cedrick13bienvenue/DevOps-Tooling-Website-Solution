@@ -2,13 +2,13 @@
 
 ## Project Overview
 
-This project implements a **DevOps Tooling Website** — a centralized web application that gives a DevOps team easy access to commonly used tools (Jenkins, Kubernetes, Artifactory, Rancher, Grafana, etc.). The solution uses a **3-Tier Architecture** on AWS consisting of:
+This project deploys the **Propitix Tooling Website** — a centralised web application that gives a DevOps team a single portal to access commonly used tools (Jenkins, Kubernetes, Artifactory, Rancher, Grafana, Prometheus, etc.). The infrastructure is built on AWS using a **3-Tier Architecture**:
 
-- **3 stateless Web Servers** (RHEL 8) serving the PHP application
-- **1 NFS Server** (RHEL 8) acting as shared file storage for all Web Servers
-- **1 Database Server** (Ubuntu 24.04) running MySQL
+- **3 stateless Web Servers** (RHEL 8) — Apache + PHP, all serving the same app
+- **1 NFS Server** (RHEL 8) — shared file storage (`/var/www` and `/var/log/httpd`) for all Web Servers via LVM-backed XFS volumes
+- **1 Database Server** (Ubuntu 24.04) — MySQL storing all application data
 
-All three Web Servers mount the same directory from the NFS server and connect to the same MySQL database — meaning they are **stateless**: any Web Server can be added or removed at any time without losing data.
+All three Web Servers mount `/var/www` and `/var/log/httpd` from the NFS server and connect to the same MySQL database. This makes them fully **stateless**: any server can be added, removed, or replaced without affecting the application or losing data. A single deployment to `/var/www/html` on any Web Server automatically applies to all three.
 
 **Technologies Used:**
 
@@ -958,20 +958,26 @@ Log in on each — the same dashboard should appear on all three, because every 
 
 ## Summary
 
-The complete DevOps Tooling Website solution is now fully operational:
+The Propitix Tooling Website solution is fully operational:
 
 | Component | Instance Name | Role | OS |
 |---|---|---|---|
-| NFS Server | `Project7-NFS` | Shared file storage via LVM + NFS | RHEL 8 |
+| NFS Server | `Project7-NFS` | LVM (XFS) + NFS shared storage | RHEL 8 |
 | Database Server | `Project7-DB` | MySQL — `tooling` DB, `webaccess` user | Ubuntu 24.04 |
-| Web Server 1 | `Project7-Web-1` | Apache + PHP serving tooling app | RHEL 8 |
-| Web Server 2 | `Project7-Web-2` | Apache + PHP serving tooling app | RHEL 8 |
-| Web Server 3 | `Project7-Web-3` | Apache + PHP serving tooling app | RHEL 8 |
+| Web Server 1 | `Project7-Web-1` | Apache + PHP 7.4 (Remi) | RHEL 8 |
+| Web Server 2 | `Project7-Web-2` | Apache + PHP 7.4 (Remi) | RHEL 8 |
+| Web Server 3 | `Project7-Web-3` | Apache + PHP 7.4 (Remi) | RHEL 8 |
 
 **Key architectural achievements:**
-- All three Web Servers share `/var/www` from NFS — one deploy reaches all servers
-- Apache logs from all Web Servers are centralized in NFS `/mnt/logs`
+- All three Web Servers share `/var/www` from NFS — one `git clone` + `cp` deploys to all three
+- Apache logs from all Web Servers are centralised in NFS `/mnt/logs` — single log location
 - The `/mnt/opt` NFS share is reserved for a future Jenkins installation
-- The Web Servers are fully **stateless** — removing or adding one does not affect the application
+- Web Servers are fully **stateless** — add or remove any one at any time without data loss
+
+**Key lessons from this implementation:**
+- On RHEL 8, the MySQL client package is `mariadb`, not `mysql`
+- When `/var/log/httpd` is NFS-mounted, Apache requires `setsebool -P httpd_use_nfs on` and `setenforce 0` to start successfully
+- The `tooling-db.sql` schema seeds an `admin`/`admin` user automatically — use `id=2` when inserting additional users to avoid a duplicate primary key error
+- Pass the MySQL password inline (`-ppassword`) to avoid the interactive prompt blocking automation
 
 ---
