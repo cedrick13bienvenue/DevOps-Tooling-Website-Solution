@@ -839,28 +839,37 @@ Save and exit (`:wq`).
 
 ### 3.10 Apply the Tooling Database Schema
 
-The repository includes `tooling-db.sql` that creates the required database tables. Apply it from the Web Server:
+The repository includes `tooling-db.sql` that creates the required database tables. Apply it from **Web Server 1**.
+
+> **RHEL 8 note**: The package `mysql` is not available in default RHEL 8 repos. Install `mariadb` instead — it provides the same `mysql` command-line client and is fully compatible.
 
 ```bash
-# Install MySQL client to connect to the remote DB server
-sudo yum install mysql -y
+# Install the MySQL-compatible client
+sudo yum install mariadb -y
 
-# Apply the schema (enter 'password' when prompted)
-mysql -h <DB-Server-Private-IP> -u webaccess -p tooling < tooling/tooling-db.sql
+# Apply the schema — use -p flag inline to avoid the interactive password prompt
+mysql -h <DB-Server-Private-IP> -u webaccess -ppassword tooling < ~/tooling/tooling-db.sql
 ```
+
+> **Note**: There is **no space** between `-p` and `password` when passing the password inline.
 
 Verify the tables were created:
 
 ```bash
-mysql -h <DB-Server-Private-IP> -u webaccess -p tooling
+mysql -h <DB-Server-Private-IP> -u webaccess -ppassword tooling -e "SHOW TABLES;"
 ```
 
-```sql
-SHOW TABLES;
-EXIT;
+Expected output:
+```
++-------------------+
+| Tables_in_tooling |
++-------------------+
+| users             |
++-------------------+
 ```
 
-> **Expected Output**: `tooling-db.sql` applies without errors; `SHOW TABLES` lists the `users` table (and others).
+> **Expected Output**: `tooling-db.sql` applies without errors; `SHOW TABLES` lists the `users` table.
+> ![Terminal — mariadb client installed; tooling-db.sql imported via mysql -h; SHOW TABLES confirming users table in tooling database](screenshoots/27.png)
 
 ---
 
