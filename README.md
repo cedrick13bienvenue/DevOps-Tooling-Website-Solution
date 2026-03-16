@@ -438,29 +438,21 @@ sudo systemctl status mysql
 
 ### 2.4 Configure MySQL to Accept Remote Connections
 
-By default, MySQL only listens on `127.0.0.1`. Change the bind address so Web Servers can connect:
+By default, MySQL only listens on `127.0.0.1`. Change the bind address so Web Servers can connect remotely.
 
 ```bash
-sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
-```
+sudo sed -i 's/bind-address.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
 
-Find the line:
+# Verify the change
+sudo grep bind-address /etc/mysql/mysql.conf.d/mysqld.cnf
 
-```
-bind-address = 127.0.0.1
-```
-
-Change it to:
-
-```
-bind-address = 0.0.0.0
-```
-
-Save and exit, then restart MySQL:
-
-```bash
+# Restart MySQL to apply
 sudo systemctl restart mysql
+sudo systemctl status mysql
 ```
+
+> **Expected Output**: `bind-address = 0.0.0.0`; `mysql.service` restarts and shows `active (running)`.
+> ![Terminal — DB server: bind-address changed to 0.0.0.0; mysql.service restarted and active; MySQL session with INSERT and SELECT users](screenshoots/28.png)
 
 ---
 
@@ -875,7 +867,7 @@ Expected output:
 
 ### 3.11 Create an Admin User in the Database
 
-On the **DB Server**, log in to MySQL and manually insert an admin user into the `tooling` database:
+On the **DB Server**, log in to MySQL and verify or insert an admin user.
 
 ```bash
 sudo mysql
@@ -884,18 +876,27 @@ sudo mysql
 ```sql
 USE tooling;
 
-INSERT INTO users (id, username, password, email, user_type, status)
-VALUES (1, 'myuser', '5f4dcc3b5aa765d61d8327deb882cf99', 'user@mail.com', 'admin', '1');
+-- Check what users already exist (tooling-db.sql may have seeded one)
+SELECT id, username, email, user_type FROM users;
+```
 
--- Verify the user was inserted
+> **Important**: If `tooling-db.sql` was applied successfully, an `admin` user with password `admin` (MD5: `21232f297a57a5a743894a0e4a801fc3`) is already present. You can log in with `admin` / `admin` immediately.
+
+To add a second admin user (`myuser` / `password`), use the next available `id` (e.g. `2`) to avoid a duplicate key error:
+
+```sql
+INSERT INTO users (id, username, password, email, user_type, status)
+VALUES (2, 'myuser', '5f4dcc3b5aa765d61d8327deb882cf99', 'user@mail.com', 'admin', '1');
+
 SELECT id, username, email, user_type FROM users;
 
 EXIT;
 ```
 
-> **Note**: `5f4dcc3b5aa765d61d8327deb882cf99` is the MD5 hash of the word `password`. The tooling app uses MD5 for authentication.
+> **Note**: `5f4dcc3b5aa765d61d8327deb882cf99` is the MD5 hash of `password`. The tooling app authenticates using MD5.
 
-> **Expected Output**: `INSERT` returns `Query OK, 1 row affected`; `SELECT` shows the `myuser` admin record.
+> **Expected Output**: `SELECT` shows at least one admin user (`admin` or `myuser`) in the `users` table.
+> ![Terminal — DB server: MySQL session; SELECT shows admin user from tooling-db.sql seed; INSERT myuser with id=2](screenshoots/28.png)
 
 ---
 
