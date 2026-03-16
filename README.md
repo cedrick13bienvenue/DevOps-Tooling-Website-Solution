@@ -904,33 +904,45 @@ EXIT;
 
 ### 4.1 Access the Tooling Website
 
-Open the website in your browser using any Web Server's public IP or DNS name:
+Get the **public IP** of any Web Server from the AWS EC2 console and open it in your browser:
 
 ```
 http://<Web-Server-Public-IP>/index.php
 ```
 
-You should see the **DevOps Tooling website login page**.
+You should see the **Propitix Tooling Website login page**.
 
-> **Expected Output**: The tooling website login page loads — showing the StegHub tooling login form.
+> **If you see a 403 Forbidden error** — run on the web server:
+> ```bash
+> sudo setenforce 0
+> sudo chmod -R 755 /var/www/html
+> sudo systemctl restart httpd
+> ```
+
+> **Expected Output**: The tooling website login page loads with a username and password form.
 
 ---
 
 ### 4.2 Log In and Verify the Dashboard
 
-Enter the admin credentials:
+The default credentials seeded by `tooling-db.sql` are:
+- **Username**: `admin`
+- **Password**: `admin`
+
+Or if you inserted `myuser` manually:
 - **Username**: `myuser`
 - **Password**: `password`
 
 Click **Login**.
 
-> **Expected Output**: Successful authentication — the DevOps Tooling dashboard is displayed, showing the list of DevOps tools (Jenkins, Kubernetes, Artifactory, etc.).
+> **Expected Output**: Successful authentication — the **Propitix Tooling Website** dashboard loads showing DevOps tools: Jenkins, Kubernetes, Grafana, Prometheus, Rancher, and more.
+> ![Browser — Propitix Tooling Website dashboard: "You are now logged in" as admin; Jenkins, Kubernetes, Grafana, Prometheus, Rancher icons visible](screenshoots/29.png)
 
 ---
 
 ### 4.3 Verify Multi-Server Redundancy
 
-To confirm all three Web Servers serve the same content, open the website using each server's public IP:
+Open the website using **each** Web Server's public IP to confirm all three serve identical content:
 
 ```
 http://<WS-1-Public-IP>/index.php
@@ -938,9 +950,9 @@ http://<WS-2-Public-IP>/index.php
 http://<WS-3-Public-IP>/index.php
 ```
 
-All three should display the same login page and the same dashboard after login — because all three read from the same NFS share and the same MySQL database.
+Log in on each — the same dashboard should appear on all three, because every server reads from the same NFS share (`/var/www`) and the same MySQL database.
 
-> **Expected Output**: All three Web Servers serve identical content, confirming the stateless architecture.
+> **Expected Output**: All three Web Servers serve identical content — confirming the stateless, shared-storage architecture is working correctly.
 
 ---
 
