@@ -106,7 +106,6 @@ sudo yum -y update
 ```
 
 > **Expected Output**: Terminal shows successful SSH login banner; `yum update` completes with `Complete!`.
-> ![Terminal — SSH into NFS server, yum update complete, and lsblk showing nvme devices](screenshoots/1.png)
 
 ---
 
