@@ -578,7 +578,6 @@ Add this line at the bottom (replace with your NFS server's private IP):
 Save and exit.
 
 > **Expected Output**: `df -h` shows `/var/www` mounted from the NFS server's private IP; `/etc/fstab` updated.
-> ![Terminal — WS-1: /mnt/apps mounted to /var/www; df -h confirms NFS mount; /etc/fstab updated with both NFS entries; mount -a succeeds](screenshoots/19.png)
 
 ---
 
