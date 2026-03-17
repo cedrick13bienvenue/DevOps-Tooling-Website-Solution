@@ -139,7 +139,7 @@ sudo df -h
 ```
 
 > **Expected Output**: `lsblk` shows 4 disks total. The 3 extra disks have no mount points and no partitions.
-> ![Terminal — lsblk output showing nvme devices with no partitions](screenshoots/1.png)
+> ![Terminal — NFS server: yum update completes with Complete!; lsblk showing nvme0n1 root disk with partitions and nvme1n1/nvme2n1/nvme3n1 as three unpartitioned EBS data volumes](screenshoots/1.png)
 
 ---
 
