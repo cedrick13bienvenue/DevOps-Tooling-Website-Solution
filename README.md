@@ -727,9 +727,9 @@ df -h
 ```
 
 > **Expected Output**: `df -h` shows both `172.31.x.x:/mnt/apps` on `/var/www` and `172.31.x.x:/mnt/logs` on `/var/log/httpd` — confirmed on all three Web Servers.
-> ![Terminal — WS-1: df -h showing /mnt/logs on /var/log/httpd and /mnt/apps on /var/www; /etc/fstab updated; mount -a clean](screenshoots/19.png)
-> ![Terminal — WS-2: same dual NFS mounts active and persisted in /etc/fstab](screenshoots/20.png)
-> ![Terminal — WS-3: same dual NFS mounts active and persisted in /etc/fstab](screenshoots/21.png)
+> ![Terminal — WS-1: sudo mount /mnt/logs to /var/log/httpd; df -h confirming 172.31.x.x:/mnt/logs on /var/log/httpd and :/mnt/apps on /var/www both active; /etc/fstab updated with both NFS entries; mount -a succeeds](screenshoots/19.png)
+> ![Terminal — WS-2: df -h showing both NFS mounts active (/mnt/apps on /var/www and /mnt/logs on /var/log/httpd); /etc/fstab persisted with both entries; mount -a clean](screenshoots/20.png)
+> ![Terminal — WS-3: df -h confirming dual NFS mounts (/var/www and /var/log/httpd) active; /etc/fstab updated; mount -a succeeds — all three web servers now share storage and centralised logs](screenshoots/21.png)
 
 ---
 
