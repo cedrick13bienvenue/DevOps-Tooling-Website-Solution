@@ -762,9 +762,8 @@ ls /var/www/html/
 You should see `index.php`, `login.php`, `functions.php`, `register.php`, `admin_tooling.php`, and other PHP files.
 
 > **Expected Output**: Repository cloned; `cp -R` deploys all files; `ls /var/www/html` lists the full PHP application.
-> ![Terminal — git install complete, git clone of tooling repo, ls /var/www/html showing PHP files](screenshoots/17.png)
-> ![Terminal — git clone complete with remote delta stats, ls /var/www/html listing index.php, login.php, functions.php and more](screenshoots/18.png)
-> ![Terminal — WS-1: git clone https://github.com/StegTechHub/tooling complete; cp -R html/ to /var/www/html; ls confirming all PHP app files deployed](screenshoots/25.png)
+> ![Terminal — WS-1: git install complete; git clone https://github.com/StegTechHub/tooling with remote delta stats; ls /var/www/html listing index.php, login.php, functions.php, register.php and other PHP app files](screenshoots/18.png)
+> ![Terminal — WS-1: SELinux setenforce 0 and setsebool httpd_use_nfs on applied; httpd.service restarted and active; git clone tooling repo; cp -R html/ to /var/www/html; ls /var/www/html confirming full PHP application deployed](screenshoots/25.png)
 
 ---
 
