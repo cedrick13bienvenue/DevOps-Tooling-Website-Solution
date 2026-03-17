@@ -619,9 +619,9 @@ sudo systemctl status httpd
 ```
 
 > **Expected Output**: `httpd.service` and `php-fpm.service` both show as `active (running)` and enabled.
-> ![Terminal — WS-1: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/13.png)
-> ![Terminal — WS-2: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/14.png)
-> ![Terminal — WS-3: PHP packages installed, httpd.service active, php-fpm.service active](screenshoots/16.png)
+> ![Terminal — WS-1: PHP 7.4 packages (php-opcache, php-gd, php-curl, php-mysqlnd) installed from Remi repo; setsebool httpd_execmem 1; php-fpm.service and httpd.service enabled and active (running)](screenshoots/13.png)
+> ![Terminal — WS-2: PHP 7.4 packages installed from Remi repo; php-fpm.service symlink created; httpd.service enabled and active (running) on port 80](screenshoots/14.png)
+> ![Terminal — WS-3: PHP 7.4 packages installed; php-fpm.service and httpd.service symlinks created; httpd.service active (running) listening on port 80](screenshoots/16.png)
 
 ---
 
