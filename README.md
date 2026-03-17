@@ -295,7 +295,6 @@ ls -la /mnt/
 ```
 
 > **Expected Output**: All three directories under `/mnt` are owned by `nobody:nobody` with `rwxrwxrwx` permissions.
-> ![Terminal — chown and chmod output; ls -la /mnt showing nobody ownership and 777 perms](screenshoots/7.png)
 
 ---
 
