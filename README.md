@@ -340,7 +340,7 @@ exporting 172.31.32.0/20:/mnt/apps
 ```
 
 > **Expected Output**: `exportfs -arv` lists all three exported paths with your subnet CIDR.
-> ![Terminal — /etc/exports content and exportfs -arv output showing all 3 exports](screenshoots/7.png)
+> ![Terminal — chown -R nobody and chmod -R 777 on /mnt/{apps,logs,opt}; ls -la /mnt confirming nobody:nobody ownership and rwxrwxrwx permissions; /etc/exports with subnet CIDR entries; exportfs -arv confirming all 3 NFS paths exported](screenshoots/7.png)
 
 ---
 
