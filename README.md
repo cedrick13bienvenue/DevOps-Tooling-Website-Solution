@@ -693,7 +693,8 @@ ls /mnt/apps/
 ```
 
 > **Expected Output**: `test.txt` created on WS-1 is immediately visible on WS-2 and on the NFS server's `/mnt/apps` — confirming NFS shared storage is working correctly.
-> ![Terminal — touch /var/www/test.txt on WS-3 and ls /var/www/html showing shared PHP application files](screenshoots/15.png)
+> ![Terminal — WS-1: httpd.service active (running); touch /var/www/test.txt attempted; ls /var/www confirming test.txt is visible via the NFS share](screenshoots/15.png)
+> ![Terminal — WS-2: PHP 7.4 and httpd active; ls /var/www showing shared test.txt confirming NFS mount propagates across all web servers](screenshoots/17.png)
 
 ---
 
